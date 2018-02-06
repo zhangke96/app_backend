@@ -40,11 +40,7 @@ def getFilesCount(request):
         return HttpResponse(allcount)
 
 # 返回文件列表
-<<<<<<< HEAD
 @check_login
-=======
-@check_login
->>>>>>> edf5e35523c5021e8769862b529f849f6560f0d2
 def getFiles(request):
     if request.method == 'GET':
         begin = 0
