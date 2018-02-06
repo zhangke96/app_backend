@@ -32,8 +32,19 @@ def handle_uploadFile(request):
                 return HttpResponse("SUCCESS")
     return HttpResponse("FAIL")
 
+# 获取用户已经上传的文件数量
+@check_login
+def getFilesCount(request):
+    if request.method == 'GET':
+        allcount = UploadFile.objects.all().filter(creator=request.user).count()
+        return HttpResponse(allcount)
+
 # 返回文件列表
- @check_login
+<<<<<<< HEAD
+@check_login
+=======
+@check_login
+>>>>>>> edf5e35523c5021e8769862b529f849f6560f0d2
 def getFiles(request):
     if request.method == 'GET':
         begin = 0
