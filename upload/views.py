@@ -4,7 +4,7 @@ from auth_system.views import check_login
 import os, json
 from app_backend.settings import BASE_DIR
 from django.http import HttpResponse,StreamingHttpResponse
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from .models import UploadFile
 from app_backend.settings import SERVER_ADDRESS
 import pdb
@@ -33,7 +33,7 @@ def handle_uploadFile(request):
     return HttpResponse("FAIL")
 
 # 返回文件列表
-# @check_login
+ @check_login
 def getFiles(request):
     if request.method == 'GET':
         begin = 0
