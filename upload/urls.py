@@ -3,6 +3,7 @@ from .views import *
 
 urlpatterns = [
     url(r'^uploadfile/$', handle_uploadFile, name='upload_file'),
+    url(r'getFileCount/$', getFilesCount, name='get_file_count'),
     url(r'getFileList/$', getFiles, name='get_files_list'),
     url(r'^file-(?P<fileId>\d+)/$', tranFile, name='download_file'),
 ]
