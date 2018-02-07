@@ -18,7 +18,6 @@ def newFileName(fileId):
 # 处理文件上传
 @check_login
 def handle_uploadFile(request):
-    pdb.set_trace()
     if request.method == 'POST':
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
