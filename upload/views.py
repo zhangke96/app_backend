@@ -57,7 +57,8 @@ def getFiles(request):
             end = end if end <= allcount else allcount
             # pdb.set_trace()
             for file in files[begin-1: end]:
-                record = {'name': file.filename, 'url': SERVER_ADDRESS + reverse('download_file', args=(file.id,))}
+                record = {'name': file.filename, 'url': SERVER_ADDRESS + reverse('download_file', args=(file.id,)),
+                          'time': str(file.upload_time), 'description': file.description}
                 records.append(record)
             return HttpResponse(json.dumps(records))
     return HttpResponse("ERROR")
