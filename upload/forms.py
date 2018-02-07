@@ -1,6 +1,7 @@
 from django import forms
 from django.db import transaction
 from .models import UploadFile, UserIcon
+from django.core.exceptions import ObjectDoesNotExist
 import pdb
 
 class UploadFileForm(forms.Form):
@@ -25,7 +26,6 @@ class UploadFileForm(forms.Form):
 
 class UploadIconForm(forms.Form):
     file = forms.FileField(required=True)   # 上传的头像
-
     def save(self, user):
         if not self.is_valid():
             return False
@@ -33,16 +33,16 @@ class UploadIconForm(forms.Form):
         file = cd['file']
         with transaction.atomic():
             newFile = UploadFile(
-                creator=user,
+                creator=None,  # 设置None不认为是个人文件
                 description="User's icon",
                 filename=file.name,
             )
             newFile.save()
-            if user.User_icon:  # 已经上传了头像
-                # pdb.set_trace()
+            try:
+                userIcon = user.User_icon # 没有异常代表已经上传了头像
                 user.User_icon.file = newFile
                 user.User_icon.save()
-            else:
+            except ObjectDoesNotExist:
                 UserIcon.objects.create(user=user, file=newFile)
             return True, newFile.id
         return False

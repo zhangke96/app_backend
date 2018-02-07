@@ -7,6 +7,7 @@ from django.http import HttpResponse,StreamingHttpResponse
 from django.urls import reverse
 from .models import UploadFile
 from app_backend.settings import SERVER_ADDRESS
+from django.core.exceptions import ObjectDoesNotExist
 import pdb
 import IPython
 
@@ -77,23 +78,24 @@ def encodeFilename(filename):
 # 传输文件
 @check_login
 def tranFile(request, fileId):
-    file = UploadFile.objects.get(id=fileId, creator=request.user)
-    if file:  # 能够搜索到
-        filename = newFileName(fileId)
-        def file_iterator(file_name, chunk_size=512):
-            with open(file_name, 'rb') as f:
-                while True:
-                    c = f.read(chunk_size)
-                    if c:
-                        yield c
-                    else:
-                        break
+    try:
+        file = UploadFile.objects.get(id=fileId, creator=request.user)
+    except ObjectDoesNotExist:
+        return HttpResponse(0, status=404)
+    filename = newFileName(fileId)
+    def file_iterator(file_name, chunk_size=512):
+        with open(file_name, 'rb') as f:
+            while True:
+                c = f.read(chunk_size)
+                if c:
+                    yield c
+                else:
+                    break
 
-        response = StreamingHttpResponse(file_iterator(filename))
-        response['Content-Disposition'] = '''attachment;filename*= UTF-8''{0}'''.format(
-            encodeFilename(file.filename))
-        return response
-    return HttpResponse(0)
+    response = StreamingHttpResponse(file_iterator(filename))
+    response['Content-Disposition'] = '''attachment;filename*= UTF-8''{0}'''.format(
+        encodeFilename(file.filename))
+    return response
 
 # 处理头像上传
 @check_login
@@ -115,8 +117,9 @@ def upload_icon(request):
 # 返回头像url
 @check_login
 def getIcon(request):
-    if request.user.User_icon:  # 上传了头像
+    try:
         result = {'url' : SERVER_ADDRESS + reverse('download_file', args=(request.user.User_icon.file.id,))}
         return HttpResponse(json.dumps(result))
-    else:
+    except ObjectDoesNotExist: # 还没有设置头像
         return HttpResponse(0, status=404)
+    return HttpResponse(0)
