@@ -7,3 +7,7 @@ class UploadFile(models.Model):
     upload_time = models.DateTimeField(auto_now_add=True)
     description = models.CharField('文件描述', max_length=1024)
     filename = models.CharField('文件名', max_length=1024)
+
+class UserIcon(models.Model):
+    user = models.OneToOneField(MyUser, related_name='User_icon', on_delete=models.SET_NULL, null=True)
+    file = models.OneToOneField(UploadFile, related_name='Icon_file', on_delete=models.SET_NULL, null=True)

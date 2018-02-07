@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from .forms import UploadFileForm
+from .forms import UploadFileForm, UploadIconForm
 from auth_system.views import check_login
 import os, json
 from app_backend.settings import BASE_DIR
@@ -94,3 +94,29 @@ def tranFile(request, fileId):
             encodeFilename(file.filename))
         return response
     return HttpResponse(0)
+
+# 处理头像上传
+@check_login
+def upload_icon(request):
+    if request.method == 'POST':
+        # pdb.set_trace()
+        form = UploadIconForm(request.POST, request.FILES)
+        if form.is_valid():
+            ret, fileid = form.save(user=request.user)
+            if ret:
+                filename = newFileName(fileid)
+                fobj = open(filename, 'wb')
+                for chrunk in request.FILES.get('file').chunks():
+                    fobj.write(chrunk)
+                fobj.close()
+                return HttpResponse("SUCCESS")
+    return HttpResponse("FAIL")
+
+# 返回头像url
+@check_login
+def getIcon(request):
+    if request.user.User_icon:  # 上传了头像
+        result = {'url' : SERVER_ADDRESS + reverse('download_file', args=(request.user.User_icon.file.id,))}
+        return HttpResponse(json.dumps(result))
+    else:
+        return HttpResponse(0, status=404)

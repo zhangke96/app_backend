@@ -1,6 +1,7 @@
 from django import forms
 from django.db import transaction
-from .models import UploadFile
+from .models import UploadFile, UserIcon
+import pdb
 
 class UploadFileForm(forms.Form):
     description = forms.CharField(max_length=1024, required=True)
@@ -19,5 +20,29 @@ class UploadFileForm(forms.Form):
                 filename = file.name,
             )
             newFile.save()
+            return True, newFile.id
+        return False
+
+class UploadIconForm(forms.Form):
+    file = forms.FileField(required=True)   # 上传的头像
+
+    def save(self, user):
+        if not self.is_valid():
+            return False
+        cd = self.cleaned_data
+        file = cd['file']
+        with transaction.atomic():
+            newFile = UploadFile(
+                creator=user,
+                description="User's icon",
+                filename=file.name,
+            )
+            newFile.save()
+            if user.User_icon:  # 已经上传了头像
+                # pdb.set_trace()
+                user.User_icon.file = newFile
+                user.User_icon.save()
+            else:
+                UserIcon.objects.create(user=user, file=newFile)
             return True, newFile.id
         return False
