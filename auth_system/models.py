@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
+from .forms import SEX
 
 class MyUserManager(BaseUserManager):
     pass
@@ -27,7 +28,8 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
     def get_all_info(self):
         return {'phone':self.mobile,
                 'email':self.email,
-                'name':self.name}
+                'name':self.name,
+                'id': self.id,}
 
     def get_mobile(self):
         return self.mobile
@@ -37,3 +39,10 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
 
     def get_name(self):
         return self.name
+
+class UserInfo(models.Model):
+    user = models.OneToOneField(MyUser, related_name='UserInfo')
+    sex = models.CharField(verbose_name='用户性别', choices=SEX, max_length=1, null=True)
+    birthday = models.DateField(verbose_name='用户生日', null=True)
+    region = models.CharField(verbose_name='用户地区', max_length=1024, null=True)
+    update_time = models.DateTimeField(verbose_name='信息更新时间', auto_now=True)

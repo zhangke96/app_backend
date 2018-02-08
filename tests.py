@@ -11,7 +11,7 @@ RESULT_FILE = "test_result.out"
 f = open(RESULT_FILE, "w")
 
 # 测试注册
-data = {'phone':'12345678901', 'email':'test@test.com', 'name':'zhangke', 'password':'123456'}
+data = {'phone':'1234567890', 'email':'test@test.com', 'name':'zhangke', 'password':'123456'}
 page = requests.post(SERVER_ADDRESS + '/account/register/', data = data)
 f.write("注册测试结果：" + page.text + " 返回的状态码： " + str(page.status_code))
 f.write("\n")
@@ -66,4 +66,18 @@ if page.status_code == 200:
     iconUrl = json.loads(page.text)['url'].replace(REMOTE_ADDRESS, SERVER_ADDRESS)
     page = requests.get(iconUrl, cookies = cookie)
     f.write("获取头像文件: " + page.text[:10] + " 返回的状态码: " + str(page.status_code))
+f.write("\n")
+
+# 测试更新个人信息
+import datetime
+info = {'sex' : 'M', 'birthday' : '1996/08/08', 'region' : '江苏'}
+page = requests.post(SERVER_ADDRESS + "/account/updateInfo/", cookies = cookie, data = info)
+f.write("更新个人信息: " + page.text + " 返回的状态码: " + str(page.status_code))
+f.write("\n")
+
+#测试获取个人信息
+page = requests.get(SERVER_ADDRESS + "/account/getInfo/", cookies = cookie)
+f.write("获取个人信息: " + page.text + " 返回的状态码: " + str(page.status_code))
+f.write("\n")
+
 f.close()

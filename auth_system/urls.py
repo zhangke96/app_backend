@@ -6,5 +6,8 @@ from . import views
 urlpatterns = [
     url(r'^register/', views.register, name='register'),
     url(r'^login/', views.login, name='login'),
-    url(r'^info/', views.info, name='info')
+    url(r'^info/', views.info, name='info'),
+    url(r'^updateInfo/', views.update_Info, name='update_info'),
+    url(r'^getInfo/', views.get_Info, name='get_info'),
+    #url(r'^weblogin/', TemplateView.as_view(template_name='auth_system/login.html'), name='weblogin'),
 ]
