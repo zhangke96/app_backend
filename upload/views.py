@@ -118,7 +118,7 @@ def upload_icon(request):
 @check_login
 def getIcon(request):
     try:
-        result = {'url' : SERVER_ADDRESS + reverse('download_file', args=(request.user.User_icon.file.id,))}
+        result = {'name': request.user.User_icon.file.filename, 'url' : SERVER_ADDRESS + reverse('download_file', args=(request.user.User_icon.file.id,))}
         return HttpResponse(json.dumps(result))
     except ObjectDoesNotExist: # 还没有设置头像
         return HttpResponse(0, status=404)
