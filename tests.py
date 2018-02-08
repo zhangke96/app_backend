@@ -1,9 +1,12 @@
 # 这个脚本用来测试写好的网络接口
-import requests
+import requests, json
 from django.urls import reverse
 from app_backend.settings import SERVER_ADDRESS
 
-SERVER_ADDRESS = "http://127.0.0.1:8000"
+LOCAL = True  # 标识是否是本地测试
+REMOTE_ADDRESS = SERVER_ADDRESS
+if LOCAL:
+    SERVER_ADDRESS = "http://127.0.0.1:8000"
 RESULT_FILE = "test_result.out"
 f = open(RESULT_FILE, "w")
 
@@ -53,7 +56,14 @@ page = requests.post(SERVER_ADDRESS + "/upload/uploadicon/", cookies = cookie, f
 f.write("上传头像文件: " + page.text[:10] + " 返回的状态码: " + str(page.status_code))
 f.write("\n")
 
-# 测试获取头像
+# 测试获取头像链接
 page = requests.get(SERVER_ADDRESS + "/upload/geticon/", cookies = cookie)
 f.write("获取头像: " + page.text[:10] + " 返回的状态码: " + str(page.status_code))
+f.write("\n")
+
+# 测试获取头像文件
+if page.status_code == 200:
+    iconUrl = json.loads(page.text)['url'].replace(REMOTE_ADDRESS, SERVER_ADDRESS)
+    page = requests.get(iconUrl, cookies = cookie)
+    f.write("获取头像文件: " + page.text[:10] + " 返回的状态码: " + str(page.status_code))
 f.close()

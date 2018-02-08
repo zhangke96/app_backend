@@ -82,7 +82,19 @@ def tranFile(request, fileId):
     try:
         file = UploadFile.objects.get(id=fileId, creator=request.user)
     except ObjectDoesNotExist:
-        return HttpResponse(0, status=404)
+        # 在检查是否是请求头像，头像没在UploadFile model里面标明是谁的
+        iconid = None
+        try:
+            iconid = request.user.User_icon.file.id
+        except ObjectDoesNotExist:
+            return HttpResponse(0, status=404)
+        if not str(iconid) == str(fileId):
+            return HttpResponse(0, status=404)
+        else:
+            try:
+                file = UploadFile.objects.get(id=fileId)
+            except ObjectDoesNotExist:
+                return HttpResponse(0, status=404)
     filename = newFileName(fileId)
     def file_iterator(file_name, chunk_size=512):
         with open(file_name, 'rb') as f:
