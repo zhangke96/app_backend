@@ -130,7 +130,7 @@ STATIC_URL = '/static/'
 
 SERVER_ADDRESS = 'http://182.254.158.97:8080'
 
-VEDIO_ADDRESS = 'http://182.254.158.97:8080/'
+VEDIO_ADDRESS = 'http://182.254.158.97:8080/download'
 APPEND_SLASH = False
 
 MEDIA_URL = "/media/"

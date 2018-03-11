@@ -78,10 +78,19 @@ def getVideos(request):
        if 1 <= begin <= allcount and end >= begin:
            end = end if end <= allcount else allcount
            for vedio in vedios.objects.all().order_by('id')[begin-1:end]:
-               record = {'name': vedio.filename, 'url': VEDIO_ADDRESS + vedio.document.url}
+               record = {'name': vedio.filename, 'url': VEDIO_ADDRESS + vedio.document.url, 'id': vedio.id}
                records.append(record)
            return HttpResponse(json.dumps(records))
        else:
            return HttpResponse("invaild request")
     else:
         return HttpResponse("GET Please")
+
+# 记录有关视频的笔记
+@check_login
+def takeNote(request):
+    """
+
+    :param request:
+    :return:
+    """
