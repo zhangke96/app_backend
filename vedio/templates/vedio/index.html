@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block content %}
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="file" name="vedio">
+        <button type="submit">上传</button>
+    </form>
+    <p>接口使用方法:</p>
+    <p>访问<a href="/vedio/number/">http://192.168.1.177/vedio/number/</a> 获取视频数目</p>
+    <p>访问<a href="/vedio/getVedio/?index=1">http://192.168.1.177/vedio/getVedio/?index=(数字)</a>获取单个视频的信息</p>
+    <p>访问<a href="/vedio/getVedios/?begin=1&end=1">http://192.168.1.177/vedio/getVedios?begin=(数字)&end=(数字)</a>获取视频url和文件名</p>
+    <p>已经上传的视频:</p>
+    <ul>
+        {% for obj in vedios %}
+            <li>
+                <a href="/download{{ obj.document.url }}">{{ obj.filename }}</a>
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}

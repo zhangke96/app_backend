@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'auth_system',
     'upload',
+    'vedio',
 ]
 
 MIDDLEWARE = [
@@ -56,7 +57,7 @@ ROOT_URLCONF = 'app_backend.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -81,7 +82,7 @@ DATABASES = {
         'NAME': 'app',
         'USER': 'root',
         'PASSWORD': '123456',
-        'HOST': '192.168.123.81',
+        'HOST': '192.168.221.128',
         'PORT': '',
     }
 }
@@ -128,3 +129,6 @@ STATIC_URL = '/static/'
 # Server address
 
 SERVER_ADDRESS = 'http://182.254.158.97:8080'
+
+VEDIO_ADDRESS = 'http://182.254.158.97:8081/'
+APPEND_SLASH = False

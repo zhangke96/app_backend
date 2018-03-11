@@ -11,14 +11,18 @@ RESULT_FILE = "test_result.out"
 f = open(RESULT_FILE, "w")
 
 # 测试注册
-data = {'phone':'1234567890', 'email':'test@test.com', 'name':'zhangke', 'password':'123456'}
+data = {'phone':'12345678901', 'email':'test@test.com', 'name':'zhangke', 'password':'123456'}
 page = requests.post(SERVER_ADDRESS + '/account/register/', data = data)
 f.write("注册测试结果：" + page.text + " 返回的状态码： " + str(page.status_code))
+if json.loads(page.text)['status'] == 'fail':
+    f.write("错误原因: " + json.loads(page.text)['info'])
 f.write("\n")
 
 # 测试登陆
 page = requests.post(SERVER_ADDRESS + '/account/login/', data = data)
 f.write("登陆测试结果: " + page.text + " 返回的状态码: " + str(page.status_code))
+if json.loads(page.text)['status'] == 'fail':
+    f.write("错误原因: " + json.loads(page.text)['info'])
 f.write("\n")
 
 # 下面的请求都需要携带cookie进行访问
@@ -78,6 +82,21 @@ f.write("\n")
 #测试获取个人信息
 page = requests.get(SERVER_ADDRESS + "/account/getInfo/", cookies = cookie)
 f.write("获取个人信息: " + page.text + " 返回的状态码: " + str(page.status_code))
+f.write("\n")
+
+# 测试获取视频数目
+page = requests.get(SERVER_ADDRESS + "/vedio/number/", cookies = cookie)
+f.write("获取视频数目: " + page.text + " 返回状态码：" + str(page.status_code))
+f.write("\n")
+
+# 测试获取单个视频信息
+page = requests.get(SERVER_ADDRESS + "/vedio/getVedio/?index=1", cookies = cookie)
+f.write("获取单个视频信息：" + page.text + " 返回状态码：" + str(page.status_code))
+f.write("\n")
+
+# 测试获取区间视频信息
+page = requests.get(SERVER_ADDRESS + "/vedio/getVedios/?begin=1&end=1", cookies = cookie)
+f.write("获取区间视频信息：" + page.text + " 返回状态码：" + str(page.status_code))
 f.write("\n")
 
 f.close()
