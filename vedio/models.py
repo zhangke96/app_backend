@@ -1,4 +1,6 @@
 from django.db import models
+# import os
+# from app_backend.settings import BASE_DIR
 
 class vedios(models.Model):
     """

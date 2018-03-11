@@ -132,3 +132,6 @@ SERVER_ADDRESS = 'http://182.254.158.97:8080'
 
 VEDIO_ADDRESS = 'http://182.254.158.97:8080/'
 APPEND_SLASH = False
+
+MEDIA_URL = "/media/"
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
