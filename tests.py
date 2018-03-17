@@ -90,13 +90,24 @@ f.write("获取视频数目: " + page.text + " 返回状态码：" + str(page.st
 f.write("\n")
 
 # 测试获取单个视频信息
-page = requests.get(SERVER_ADDRESS + "/vedio/getVedio/?index=1", cookies = cookie)
+page = requests.get(SERVER_ADDRESS + "/vedio/getVedio/?index=7", cookies = cookie)
 f.write("获取单个视频信息：" + page.text + " 返回状态码：" + str(page.status_code))
 f.write("\n")
 
 # 测试获取区间视频信息
-page = requests.get(SERVER_ADDRESS + "/vedio/getVedios/?begin=1&end=1", cookies = cookie)
+page = requests.get(SERVER_ADDRESS + "/vedio/getVedios/?begin=1&end=7", cookies = cookie)
 f.write("获取区间视频信息：" + page.text + " 返回状态码：" + str(page.status_code))
+f.write("\n")
+
+# 测试更新笔记
+info = {'vedioId':11, 'note':'我测试一下笔记内容'}
+page = requests.post(SERVER_ADDRESS + "/vedio/updateNote/", cookies = cookie, data = info)
+f.write("更新笔记: " + page.text + " 返回状态码: " + str(page.status_code))
+f.write("\n")
+
+# 测试获取笔记和描述
+page = requests.get(SERVER_ADDRESS + "/vedio/getInfo-11/", cookies = cookie)
+f.write("获取笔记和描述: " + page.text + " 返回状态码: " + str(page.status_code))
 f.write("\n")
 
 f.close()

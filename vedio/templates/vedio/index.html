@@ -2,7 +2,9 @@
 {% block content %}
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
-        <input type="file" name="vedio">
+        <input type="file" name="vedio"><br>
+        <p>请输入视频描述功能</p>
+        <input type="text" name="description">
         <button type="submit">上传</button>
     </form>
     <p>接口使用方法:</p>
