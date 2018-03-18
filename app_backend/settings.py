@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'auth_system',
     'upload',
     'vedio',
+    'channels',
 ]
 
 MIDDLEWARE = [
@@ -135,3 +136,14 @@ APPEND_SLASH = False
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# Channel settings
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "asgi_redis.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [os.environ.get('REDIS_URL', 'redis://192.168.221.128:6379')],
+        },
+        "ROUTING": "message.routing.message_routing",
+    },
+}
