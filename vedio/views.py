@@ -48,7 +48,8 @@ def getVideo(request):
            return HttpResponse(0)
        allcount = vedios.objects.all().count()
        if 1 <= index <= allcount:
-           record = {'name': vedios.objects.all()[index-1].filename, 'url': VEDIO_ADDRESS + vedios.objects.all()[index-1].document.url}
+           record = {'name': vedios.objects.all()[index-1].filename, 'url': VEDIO_ADDRESS + vedios.objects.all()[index-1].document.url,
+                     'cover': VEDIO_ADDRESS + vedios.objects.all()[index-1].cover.url}
            records.append(record)
            return HttpResponse(json.dumps(records))
        else:
@@ -80,7 +81,8 @@ def getVideos(request):
        if 1 <= begin <= allcount and end >= begin:
            end = end if end <= allcount else allcount
            for vedio in vedios.objects.all().order_by('id')[begin-1:end]:
-               record = {'name': vedio.filename, 'url': VEDIO_ADDRESS + vedio.document.url, 'id': vedio.id}
+               record = {'name': vedio.filename, 'url': VEDIO_ADDRESS + vedio.document.url, 'id': vedio.id,
+                         'cover': VEDIO_ADDRESS + vedio.cover.url}
                records.append(record)
            return HttpResponse(json.dumps(records))
        else:

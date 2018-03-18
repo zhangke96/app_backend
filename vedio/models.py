@@ -13,6 +13,7 @@ class vedios(models.Model):
     content_type = models.CharField(max_length=200, null=True)
     document = models.FileField(upload_to='vedioFile/')
     description = models.TextField("视频描述", default="", null=True)
+    cover = models.FileField(upload_to='vedioFile/', null=True) # 视频的封面
 
 class vedioNote(models.Model):
     """

@@ -5,11 +5,13 @@ from .models import vedios
 class VedioForm(forms.Form):
     vedio = forms.FileField(required=True)
     description = forms.CharField(required=True)
+    cover = forms.FileField(required=True)
 
     def save(self):
         file = self.cleaned_data['vedio']
         newvedio = vedios(filename=file.name, content_type=file.content_type, document=file,
-                          description=self.cleaned_data['description'])
+                          description=self.cleaned_data['description'],
+                          cover=self.cleaned_data['cover'])
         newvedio.save()
         return newvedio
 
