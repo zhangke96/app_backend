@@ -10,6 +10,8 @@ from django.core.exceptions import ObjectDoesNotExist
 import datetime, time
 import pdb
 import IPython
+from django.urls import reverse
+from app_backend.settings import SERVER_ADDRESS
 
 def getDupKey(s):
     """
@@ -126,3 +128,85 @@ def get_Info(request):
     if info.region:
         result['region'] = info.region
     return HttpResponse(json.dumps(result))
+
+@check_login
+# 添加好友
+def add_friend(request):
+    if request.method == 'POST':
+        form = forms.addFriendForm(request.POST)
+        if form.is_valid():
+            phone = form.cleaned_data['phone']
+            friend = None
+            try:
+                friend = models.MyUser.objects.get(mobile=phone)
+            except:
+                return HttpResponse(json.dumps({'status': 'fail', 'info':'用户不存在'}))
+            if friend == request.user:
+                return HttpResponse(json.dumps({'status':'fail','info':'不能加自己为好友'}))
+            for fri in request.user.friends.all():
+                if friend == fri:
+                    return HttpResponse(json.dumps({'status':'fail','info':'已经是好友了'}))
+            # 可以加好友了
+            try:
+                with transaction.atomic():
+                    models.FriendShip.objects.create(user=request.user, friend=friend)
+                    models.FriendShip.objects.create(user=friend, friend=request.user)
+            except:
+                return HttpResponse(json.dumps({'status':'fail','info':'加好友的时候出现问题'}))
+            return HttpResponse(json.dumps({'status':'success'}))
+        else:
+            return HttpResponse(json.dumps({'status':'fail','info':'表单错误'}))
+    else:
+        return HttpResponse(json.dumps({'status':'fail','info':'请使用POST'}))
+
+@check_login
+# 搜索用户
+def search_user(request):
+    if request.method == 'GET':
+        form = forms.searchForm(request.GET)
+        # pdb.set_trace()
+        if form.is_valid():
+            p = form.cleaned_data['q']
+            mobileSimilar = models.MyUser.objects.filter(mobile__icontains=p)
+            emialSimilar = models.MyUser.objects.filter(email__icontains=p)
+            nameSimilar = models.MyUser.objects.filter(name__icontains=p)
+            users = set()
+            for i in mobileSimilar.all():
+                users.add(i)
+            for i in emialSimilar.all():
+                users.add(i)
+            for i in nameSimilar.all():
+                users.add(i)
+            results = []
+            users.remove(request.user) # 移除自己
+            for i in users:
+                ecord = None
+                try:
+                    i.User_icon
+                    record = {'phone': i.mobile, 'email': i.email, 'name': i.name,
+                              'iconname': i.User_icon.file.filename,
+                              'iconurl': SERVER_ADDRESS + reverse('download_file', args=(i.User_icon.file.id,))}
+                except:
+                    record = {'phone': i.mobile, 'email': i.email, 'name': i.name}
+                results.append(record)
+            return HttpResponse(json.dumps(results))
+
+    return HttpResponse("Fail")
+            
+@check_login
+# 返回好友列表
+def get_friends(request):
+    if request.method == 'GET':
+        results = []
+        for i in request.user.friends.all():
+            record = None
+            try:
+                i.User_icon
+                record = {'phone':i.mobile, 'email':i.email, 'name':i.name,
+                              'iconname':i.User_icon.file.filename,
+                              'iconurl':SERVER_ADDRESS + reverse('download_file', args=(i.User_icon.file.id,))}
+            except:
+                record = {'phone': i.mobile, 'email': i.email, 'name': i.name}
+            results.append(record)
+        return HttpResponse(json.dumps(results))
+    return HttpResponse("Fail")

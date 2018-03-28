@@ -22,6 +22,11 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=True)
     USERNAME_FIELD = 'mobile'
     REQUIRED_FIELDS = ['email', 'name']
+    friends = models.ManyToManyField(
+        'MyUser',
+        through='FriendShip',
+        through_fields=('user', 'friend')
+    )
 
     objects = MyUserManager()
 
@@ -46,3 +51,11 @@ class UserInfo(models.Model):
     birthday = models.DateField(verbose_name='用户生日', null=True)
     region = models.CharField(verbose_name='用户地区', max_length=1024, null=True)
     update_time = models.DateTimeField(verbose_name='信息更新时间', auto_now=True)
+
+class FriendShip(models.Model):
+    """
+    用来描述用户之间的好友关系
+    """
+    user = models.ForeignKey(MyUser)
+    friend = models.ForeignKey(MyUser, related_name='all_friends')
+    time = models.DateTimeField(auto_now_add=True)

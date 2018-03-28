@@ -15,3 +15,9 @@ class InfoForm(forms.Form):
     sex = forms.ChoiceField(choices=SEX, required=False)
     birthday = forms.CharField(label='生日时间', max_length=10, required=False)
     region = forms.CharField(label='地区', max_length=1024, required=False)
+
+class addFriendForm(forms.Form):
+    phone = forms.CharField(label="手机号码", max_length=11, required=True)
+
+class searchForm(forms.Form):
+    q = forms.CharField(label="搜索内容", max_length=10000, required=True)
