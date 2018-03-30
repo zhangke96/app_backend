@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'upload',
     'vedio',
     'channels',
+    'message',
 ]
 
 MIDDLEWARE = [
