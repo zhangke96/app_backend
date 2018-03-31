@@ -5,7 +5,7 @@ from app_backend.settings import SERVER_ADDRESS
 import websocket, time
 import _thread as thread
 
-LOCAL = True  # 标识是否是本地测试
+LOCAL = False  # 标识是否是本地测试
 REMOTE_ADDRESS = SERVER_ADDRESS
 if LOCAL:
     SERVER_ADDRESS = "http://127.0.0.1:8000"

@@ -15,10 +15,12 @@ Including another URLconf
 """
 from django.conf.urls import url, include
 from django.contrib import admin
+from django.views.generic import TemplateView
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^account/', include('auth_system.urls')),
     url(r'^upload/', include('upload.urls')),
     url(r'^vedio/', include('vedio.urls')),
+    url(r'^test/', TemplateView.as_view(template_name='tool.html'))
 ]

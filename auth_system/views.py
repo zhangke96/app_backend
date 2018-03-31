@@ -50,7 +50,8 @@ def register(request):
                     return HttpResponse(json.dumps({'status': 'fail', 'info': '邮箱已经存在'}))
                 return HttpResponse(json.dumps({'status': 'fail', 'info':'账号已经存在'}))
             return HttpResponse(json.dumps({'status':'success'}))
-
+        else:
+            return HttpResponse(json.dumps({'status':'fail', 'info':'not vaild form'}))
     return HttpResponse(json.dumps({'status':'fail', 'info':'not support method'}))
 
 def login(request):

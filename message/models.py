@@ -29,3 +29,23 @@ class MeetingParticipants(models.Model):
     user = models.ForeignKey(MyUser)
     ifConfirmed = models.BooleanField(default=False)
     confirmTime = models.DateTimeField(null=True)
+
+class Task(models.Model):
+    id = models.AutoField(primary_key=True)
+    originator = models.ForeignKey(MyUser, related_name='organizedTasks')
+    create_time = models.DateTimeField(auto_now_add=True)
+    deadline = models.DateTimeField("任务截止时间")
+    content = models.TextField("任务内容")
+    performers = models.ManyToManyField(
+        MyUser,
+        through='TaskPerformers',
+        through_fields=('task', 'user')
+    )
+
+class TaskPerformers(models.Model):
+    task = models.ForeignKey(Task)
+    user = models.ForeignKey(MyUser)
+    ifConfirmed = models.BooleanField(default=False)
+    confirmTime = models.DateTimeField(null=True)
+    ifFinished = models.BooleanField(default=False)
+    finishedTime = models.DateTimeField(null=True)
