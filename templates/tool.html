@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8">
+</head>
+
+<body>
+    <button onclick="showRegister()">打开注册</button>
+    <button onclick="showLogin()">打开登陆</button>
+    <div id="register" style="border-style:solid double" hidden="true">
+        <h3>注册账户</h3>
+        <form action="/account/register/" method="post">
+            <p>电话号码：</p>
+            <input type="text" name="phone">
+            <p>邮箱</p>
+            <input type="text" name="email">
+            <p>姓名</p>
+            <input type="text" name="name">
+            <p>密码</p>
+            <input type="password" name="password">
+            <input type="submit">   
+        </form>
+    </div>
+    <div id="login" style="border-style:solid double" hidden="true">
+        <h3>登陆账户</h3>
+        <form action="/account/login/" method="post">
+            <p>电话号码：</p>
+            <input type="text" name="phone">
+            <p>密码：</p>
+            <input type="password" name="password">
+            <input type="submit">
+        </form>
+    </div>
+    <textarea id="ws_test" rows="10", cols="50"></textarea>
+    <button id="submitaction" onclick="submitmessage()">提交</button>
+    <script>
+        function showRegister() {
+            var state = document.getElementById("register").hidden;
+            document.getElementById("register").hidden = !state;
+        }
+        function showLogin() {
+            var state = document.getElementById("login").hidden;
+            document.getElementById("login").hidden = !state;
+        }
+        var ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";
+        var ws = new WebSocket(ws_scheme + '://' + window.location.host  + window.location.pathname);
+        ws.onmessage = handleMessage;
+        function handleMessage(message)
+        {
+            {#alert(message.data);#}
+            msg = JSON.parse(message.data);
+            if (msg['status'] == "success")
+            {
+                alert("success");
+            }
+            else if (msg["status"] == "fail")
+            {
+                alert(msg["info"]);
+            }
+            if (msg['id'])
+            {
+                alert(message.data);
+            }
+        }
+        function submitmessage()
+        {
+            ws.send(document.getElementById("ws_test").value);
+        }
+    </script>
+</body>
