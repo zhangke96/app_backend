@@ -5,7 +5,7 @@ from app_backend.settings import SERVER_ADDRESS
 import websocket, time
 import _thread as thread
 
-LOCAL = False  # 标识是否是本地测试
+LOCAL = True  # 标识是否是本地测试
 REMOTE_ADDRESS = SERVER_ADDRESS
 if LOCAL:
     SERVER_ADDRESS = "http://127.0.0.1:8000"
@@ -128,8 +128,48 @@ page = requests.get(SERVER_ADDRESS + "/account/getFriends/", cookies = cookie)
 f.write("获取好友列表: " + page.text + " 返回状态吗: " + str(page.status_code))
 f.write("\n")
 
+# 测试获取所有发送的消息
+page = requests.get(SERVER_ADDRESS + "/message/sendedMessage/", cookies = cookie)
+f.write("获取所有发送的消息: " + page.text + " 返回状态码: " + str(page.status_code))
+f.write("\n")
+
+# 测试获取所有发送到某个好友的消息
+page = requests.get(SERVER_ADDRESS + "/message/sendToFriendMessage/?phone=15850782151", cookies = cookie)
+f.write("获取所有发送到某个好友的消息: " + page.text + " 返回状态码: " + str(page.status_code))
+f.write("\n")
+
+# 测试获取所有接受的消息
+page = requests.get(SERVER_ADDRESS + "/message/receivedMessage/", cookies = cookie)
+f.write("获取所有接受的消息: " + page.text + " 返回状态码: " + str(page.status_code))
+f.write("\n")
+
+# 测试获取所有从某个好友接受的消息
+page = requests.get(SERVER_ADDRESS + "/message/receiveFromFriendMessage/?phone=15850782151", cookies = cookie)
+f.write("获取所有从某个好友接受的消息: " + page.text + " 返回状态码: " + str(page.status_code))
+f.write("\n")
+
+# 测试获取所有组织的会议
+page = requests.get(SERVER_ADDRESS + "/message/organizedMeeting/", cookies = cookie)
+f.write("获取所有组织的会议: " + page.text + " 返回状态码: " + str(page.status_code))
+f.write("\n")
+
+# 测试获取所有参加的会议
+page = requests.get(SERVER_ADDRESS + "/message/participateMeeting/", cookies = cookie)
+f.write("获取所有参加的会议: " + page.text + " 返回状态码: " + str(page.status_code))
+f.write("\n")
+
+# 测试获取所有发起的任务
+page = requests.get(SERVER_ADDRESS + "/message/organizedTask/", cookies = cookie)
+f.write("获取所有发起的任务: " + page.text + " 返回状态码: " + str(page.status_code))
+f.write("\n")
+
+# 测试获取所有执行的任务
+page = requests.get(SERVER_ADDRESS + "/message/perfromTask/", cookies = cookie)
+f.write("获取所有执行的任务: " + page.text + " 返回状态码: " + str(page.status_code))
+f.write("\n")
 
 f.close()
+
 # 构造websocket header
 wsheader = {'Cookie': 'sessionid='+ str(cookie.get('sessionid'))}
 

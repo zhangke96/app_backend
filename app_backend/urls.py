@@ -22,5 +22,6 @@ urlpatterns = [
     url(r'^account/', include('auth_system.urls')),
     url(r'^upload/', include('upload.urls')),
     url(r'^vedio/', include('vedio.urls')),
+    url(r'^message/', include('message.urls')),
     url(r'^test/', TemplateView.as_view(template_name='tool.html'))
 ]

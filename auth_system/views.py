@@ -179,7 +179,10 @@ def search_user(request):
             for i in nameSimilar.all():
                 users.add(i)
             results = []
-            users.remove(request.user) # 移除自己
+            try:
+                users.remove(request.user) # 移除自己
+            except:
+                pass
             for i in users:
                 ecord = None
                 try:

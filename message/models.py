@@ -26,7 +26,7 @@ class Meeting(models.Model):
 
 class MeetingParticipants(models.Model):
     meeting = models.ForeignKey(Meeting)
-    user = models.ForeignKey(MyUser)
+    user = models.ForeignKey(MyUser, related_name='participate_meetings')
     ifConfirmed = models.BooleanField(default=False)
     confirmTime = models.DateTimeField(null=True)
 
@@ -44,7 +44,7 @@ class Task(models.Model):
 
 class TaskPerformers(models.Model):
     task = models.ForeignKey(Task)
-    user = models.ForeignKey(MyUser)
+    user = models.ForeignKey(MyUser, related_name='performer_tasks')
     ifConfirmed = models.BooleanField(default=False)
     confirmTime = models.DateTimeField(null=True)
     ifFinished = models.BooleanField(default=False)
