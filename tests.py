@@ -128,6 +128,11 @@ page = requests.get(SERVER_ADDRESS + "/account/getFriends/", cookies = cookie)
 f.write("获取好友列表: " + page.text + " 返回状态吗: " + str(page.status_code))
 f.write("\n")
 
+# 测试获取好友信息
+page = requests.get(SERVER_ADDRESS + "/account/getFriendInfo/?q=15850782151", cookies = cookie)
+f.write("获取好友信息: " + page.text + " 返回状态吗: " + str(page.status_code))
+f.write("\n")
+
 # 测试获取所有发送的消息
 page = requests.get(SERVER_ADDRESS + "/message/sendedMessage/", cookies = cookie)
 f.write("获取所有发送的消息: " + page.text + " 返回状态码: " + str(page.status_code))

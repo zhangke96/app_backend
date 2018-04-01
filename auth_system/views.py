@@ -210,7 +210,35 @@ def get_friends(request):
                               'iconname':i.User_icon.file.filename,
                               'iconurl':SERVER_ADDRESS + reverse('download_file', args=(i.User_icon.file.id,))}
             except:
-                record = {'phone': i.mobile, 'email': i.email, 'name': i.name}
+                record = {'phone': i.mobile, 'email': i.email, 'name': i.name, 'iconname':"", 'iconurl':""}
             results.append(record)
         return HttpResponse(json.dumps(results))
     return HttpResponse("Fail")
+
+@check_login
+# 返回某个好友的个人信息
+def get_friend_info(request):
+    if request.method == 'GET':
+        form = forms.searchForm(request.GET) # 用来作为查看好友信息的form
+        if form.is_valid():
+            friendPhone = form.cleaned_data['q']
+            friend = None
+            try:
+                friend = models.MyUser.objects.get(mobile=friendPhone)
+            except:
+                return HttpResponse(json.dumps({"status":"fail","info":"找不到用户"}))
+            try:
+                models.FriendShip.objects.get(user=request.user, friend=friend)
+            except:
+                return HttpResponse(json.dumps({"status":"fail", "info":"不是你的好友"}))
+            record = None
+            try:
+                friend.User_icon
+                record = {'phone': friend.mobile, 'email': friend.email, 'name': friend.name,
+                          'iconname': friend.User_icon.file.filename,
+                          'iconurl': SERVER_ADDRESS + reverse('download_file', args=(friend.User_icon.file.id,))}
+            except:
+                record = {'phone': friend.mobile, 'email': friend.email, 'name': friend.name, 'iconname': "", 'iconurl': ""}
+            return HttpResponse(json.dumps(record))
+        return HttpResponse(json.dumps({"status":"fail", "info":"不正确的表单"}))
+    return HttpResponse(json.dumps({"status":"fail", "info":"不支持的HTTP Method"}))
