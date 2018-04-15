@@ -173,6 +173,7 @@ def ws_receive(message):
         except:
             sendMsgToSomeone(message.user, {"status":"fail","info":"创建任务出现问题"})
             return
+        sendMsgToSomeone(message.user, {"status": "success"})
         taskInfo = {"id": newTask.id, "type": "task", "deadline": deadline,
                     'content': content, "from": message.user.mobile}
         for member in member_object_list:
