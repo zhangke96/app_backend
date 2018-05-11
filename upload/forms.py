@@ -1,6 +1,6 @@
 from django import forms
 from django.db import transaction
-from .models import UploadFile, UserIcon
+from .models import UploadFile, UserIcon, Invoice
 from django.core.exceptions import ObjectDoesNotExist
 import pdb
 
@@ -44,5 +44,22 @@ class UploadIconForm(forms.Form):
                 user.User_icon.save()
             except ObjectDoesNotExist:
                 UserIcon.objects.create(user=user, file=newFile)
+            return True, newFile.id
+        return False
+
+class UploadInvoiceForm(forms.Form):
+    file = forms.FileField(required=True)
+
+    def save(self, user):
+        if not self.is_valid():
+            return False
+        cd = self.cleaned_data
+        file = cd['file']
+        with transaction.atomic():
+            newFile = Invoice(
+                creator = user,
+                filename = file.name,
+            )
+            newFile.save()
             return True, newFile.id
         return False

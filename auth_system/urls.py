@@ -13,5 +13,5 @@ urlpatterns = [
     url(r'^search/', views.search_user, name='search_user'),
     url(r'^getFriends/', views.get_friends, name='get_friends'),
     url(r'^getFriendInfo/', views.get_friend_info, name='get_friend_info'),
-    #url(r'^weblogin/', TemplateView.as_view(template_name='auth_system/login.html'), name='weblogin'),
+    url(r'^weblogin/', TemplateView.as_view(template_name='auth_system/login.html'), name='weblogin'),
 ]

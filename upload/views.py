@@ -1,11 +1,11 @@
 from django.shortcuts import render
-from .forms import UploadFileForm, UploadIconForm
+from .forms import UploadFileForm, UploadIconForm, UploadInvoiceForm
 from auth_system.views import check_login
 import os, json
 from app_backend.settings import BASE_DIR
 from django.http import HttpResponse,StreamingHttpResponse
 from django.urls import reverse
-from .models import UploadFile
+from .models import UploadFile, Invoice
 from app_backend.settings import SERVER_ADDRESS
 from django.core.exceptions import ObjectDoesNotExist
 import pdb
@@ -14,6 +14,10 @@ import IPython
 
 def newFileName(fileId):
     filename = os.path.join(BASE_DIR, 'uploadFile/'+str(fileId))
+    return filename
+
+def newInvoiceFileName(fileId):
+    filename = os.path.join(BASE_DIR, 'uploadInvoice/'+str(fileId))
     return filename
 
 # 处理文件上传
@@ -25,6 +29,22 @@ def handle_uploadFile(request):
             ret, fileid = form.save(user=request.user)
             if ret:
                 filename = newFileName(fileid)
+                fobj = open(filename, 'wb')
+                for chrunk in request.FILES.get('file').chunks():
+                    fobj.write(chrunk)
+                fobj.close()
+                return HttpResponse("SUCCESS")
+    return HttpResponse("FAIL")
+
+# 处理发票上传
+@check_login
+def handle_uploadInvoiceFile(request):
+    if request.method == 'POST':
+        form = UploadInvoiceForm(request.POST, request.FILES)
+        if form.is_valid():
+            ret, fileid = form.save(user=request.user)
+            if ret:
+                filename = newInvoiceFileName(fileid)
                 fobj = open(filename, 'wb')
                 for chrunk in request.FILES.get('file').chunks():
                     fobj.write(chrunk)
@@ -135,4 +155,38 @@ def getIcon(request):
         return HttpResponse(json.dumps(result))
     except ObjectDoesNotExist: # 还没有设置头像
         return HttpResponse(0, status=404)
-    return HttpResponse(0)
+
+# 传输发票文件
+@check_login
+def tranInvoice(request, fileId):
+    try:
+        file = Invoice.objects.get(id=fileId, creator=request.user)
+    except ObjectDoesNotExist:
+        return HttpResponse(0, status=404)
+    filename = newInvoiceFileName(fileId)
+    def file_iterator(file_name, chunk_size=512):
+        with open(file_name, 'rb') as f:
+            while True:
+                c = f.read(chunk_size)
+                if c:
+                    yield c
+                else:
+                    break
+
+    response = StreamingHttpResponse(file_iterator(filename))
+    response['Content-Disposition'] = '''attachment;filename*= UTF-8''{0}'''.format(
+        encodeFilename(file.filename))
+    return response
+
+# 返回发票列表
+@check_login
+def getInvoices(request):
+    if request.method == 'GET':
+        records = []
+        files = Invoice.objects.all().filter(creator=request.user).order_by('id')
+        for file in files:
+            record = {'url': SERVER_ADDRESS + reverse('download_invoice', args=(file.id,)),
+                      'time': str(file.upload_time)}
+            records.append(record)
+        return HttpResponse(json.dumps(records))
+    return HttpResponse("ERROR")

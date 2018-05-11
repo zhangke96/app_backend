@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<htm lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>申请批准</title>
+    {% load static %}
+    <link href="{% static "css/bootstrap.css" %}" rel="stylesheet">
+    <!--external css-->
+    <link href="{% static "font-awesome/css/font-awesome.css" %}" rel="stylesheet"/>
+    <script src="{% static "js/jquery.js" %}"></script>
+    <script src="{% static "js/bootstrap.min.js" %}"></script>
+    <script src="{% static "js/jquery-ui-1.9.2.custom.min.js" %}"></script>
+    <script src="{% static 'js/jquery-confirm.min.js' %}"></script>
+    <link href="{% static 'css/jquery-confirm.min.css' %}" rel="stylesheet">
+    <script src="{% static 'js/bootstrap-table.min.js' %}"></script>
+    <link href="{% static 'css/bootstrap-table.min.css' %}" rel="stylesheet">
+    <script src="{% static 'js/bootstrap-table-zh-CN.min.js' %}"></script>
+</head>
+<body>
+    <p>备用金审批</p>
+    <table id="rftable"
+           data-toggle="table"
+           data-url="{% url 'get_reverse'%}"
+           data-side-pagination="server"
+           data-classes="table table-hover table-condensed"
+           data-striped="true"
+           data-pagination="true"
+           data-page-list="[10, 20, 50, 100, 200]"
+    >
+        <thead>
+        <tr>
+            <th data-field="id" data-visible="false">ID</th>
+            <th data-field="applicant">申请人</th>
+            <th data-field="department">部门</th>
+            <th data-field="detail">事由</th>
+            <th data-field="moneny">金额</th>
+            <th data-field="useDate">使用日期</th>
+            <th data-field="returnDate">归还日期</th>
+            <th data-field="cashier">出纳</th>
+            <th data-field="note">备注</th>
+            <th class="nobr" data-field="id" data-formatter="reverseFundFormatter" data-events="actionEvents">操作</th>
+        </tr>
+        </thead>
+    </table>
+    <p>付款审批</p>
+    <table id="ptable"
+           data-toggle="table"
+           data-url="{% url 'get_payment'%}"
+           data-side-pagination="server"
+           data-classes="table table-hover table-condensed"
+           data-striped="true"
+           data-pagination="true"
+           data-page-list="[10, 20, 50, 100, 200]"
+    >
+        <thead>
+        <tr>
+            <th data-field="id" data-visible="false">ID</th>
+            <th data-field="detail">付款事由</th>
+            <th data-field="moneny">付款总额</th>
+            <th data-field="payType">付款方式</th>
+            <th data-field="date">支付日期</th>
+            <th data-field="payTo">支付对象</th>
+            <th data-field="bank">开户行</th>
+            <th data-field="account">银行账户</th>
+            <th class="nobr" data-field="id" data-formatter="paymentFormatter" data-events="paymentActionEvents">操作</th>
+        </tr>
+        </thead>
+    </table>
+    <p>报销审批</p>
+    <table id="rbtable"
+           data-toggle="table"
+           data-url="{% url 'get_rb'%}"
+           data-side-pagination="server"
+           data-classes="table table-hover table-condensed"
+           data-striped="true"
+           data-pagination="true"
+           data-page-list="[10, 20, 50, 100, 200]"
+    >
+        <thead>
+        <tr>
+            <th data-field="id" data-visible="false">ID</th>
+            <th data-field="moneny">报销金额</th>
+            <th data-field="type">报销类别</th>
+            <th data-field="detail">费用明细</th>
+            <th class="nobr" data-field="id" data-formatter="rbFormatter" data-events="rbActionEvents">操作</th>
+        </tr>
+        </thead>
+    </table>
+    <script>
+        function reverseFundFormatter(value)
+        {
+            if (value.toString().split('-')[1] == '0') // 还没有审核
+            {
+                return '<a class="btn btn-primary btn-xs confirmReverseFund" href="javascript:void(0)" title="审批同意" aria-label="审批同意" data-pjax="0"><span class="glyphicon glyphicon-ok"></span></a>' +
+                    '<a class="btn btn-primary btn-xs rejectReverseFund" href="javascript:void(0)" title="拒绝" aria-label="拒绝" data-pjax="0"><span class="glyphicon glyphicon-remove"></span></a>';
+            }
+            else
+            {
+                return '<a class="btn btn-primary btn-xs viewReverseFund" href="javascript:void(0)" title="查看" aria-label="查看" data-pjax="0"><span class="glyphicon glyphicon-info-sign"></span></a>'
+            }
+        }
+        function confirmR(id, confirmed) {
+            $.ajax({
+                url: '{% url 'confirm_reverse' %}',
+                method: 'post',
+                data: {'id': id, 'confirm': confirmed},
+            }).done(function (response) {
+                if (response == 1) {
+                    $.alert("审批成功");
+                    $('#rftable').bootstrapTable('refresh');
+                }
+                else {
+                    $.alert("审批发生错误");
+                    $('#rftable').bootstrapTable('refresh');
+                }
+            });
+        }
+        function viewR(id) {
+            $.ajax({
+                url: '{% url 'view_reverse' %}',
+                method: 'get',
+                data: {'id': id}
+            }).done(function (response) {
+               if (response != "")
+               {
+                   result = JSON.parse(response);
+                   var toDisplay = '<p>审核结果: '
+                   toDisplay += result['result'] ? "通过" : "拒绝";
+                   toDisplay += '</p><p>审核者: ';
+                   toDisplay += result['user'] + '</p><p>审核时间: ';
+                   toDisplay += result['time'];
+                   toDisplay += '</p>';
+                   console.log(toDisplay);
+                   $.alert(toDisplay);
+               }
+            });
+        }
+        window.actionEvents = {
+            'click .confirmReverseFund': function (e, value) {
+                confirmR(value.toString().split('-')[0], true);
+            },
+            'click .rejectReverseFund': function (e, value) {
+                confirmR(value.toString().split('-')[0], false);
+            },
+            'click .viewReverseFund': function (e, value) {
+                viewR(value.toString().split('-')[0]);
+            }
+        };
+        function paymentFormatter(value)
+        {
+            if (value.toString().split('-')[1] == '0') // 还没有审核
+            {
+                return '<a class="btn btn-primary btn-xs confirmPayment" href="javascript:void(0)" title="审批同意" aria-label="审批同意" data-pjax="0"><span class="glyphicon glyphicon-ok"></span></a>' +
+                    '<a class="btn btn-primary btn-xs rejectPayment" href="javascript:void(0)" title="拒绝" aria-label="拒绝" data-pjax="0"><span class="glyphicon glyphicon-remove"></span></a>';
+            }
+            else
+            {
+                return '<a class="btn btn-primary btn-xs viewPayment" href="javascript:void(0)" title="查看" aria-label="查看" data-pjax="0"><span class="glyphicon glyphicon-info-sign"></span></a>'
+            }
+        }
+        function confirmP(id, confirmed) {
+            $.ajax({
+                url: '{% url 'confirm_payment' %}',
+                method: 'post',
+                data: {'id': id, 'confirm': confirmed},
+            }).done(function (response) {
+                if (response == 1) {
+                    $.alert("审批成功");
+                    $('#ptable').bootstrapTable('refresh');
+                }
+                else {
+                    $.alert("审批发生错误");
+                    $('#ptable').bootstrapTable('refresh');
+                }
+            });
+        }
+        function viewP(id) {
+            $.ajax({
+                url: '{% url 'view_payment' %}',
+                method: 'get',
+                data: {'id': id}
+            }).done(function (response) {
+               if (response != "")
+               {
+                   result = JSON.parse(response);
+                   var toDisplay = '<p>审核结果: '
+                   toDisplay += result['result'] ? "通过" : "拒绝";
+                   toDisplay += '</p><p>审核者: ';
+                   toDisplay += result['user'] + '</p><p>审核时间: ';
+                   toDisplay += result['time'];
+                   toDisplay += '</p>';
+                   console.log(toDisplay);
+                   $.alert(toDisplay);
+               }
+            });
+        }
+        window.paymentActionEvents = {
+            'click .confirmPayment': function (e, value) {
+                confirmP(value.toString().split('-')[0], true);
+            },
+            'click .rejectPayment': function (e, value) {
+                confirmP(value.toString().split('-')[0], false);
+            },
+            'click .viewPayment': function (e, value) {
+                viewP(value.toString().split('-')[0]);
+            }
+        };
+        function rbFormatter(value)
+        {
+            if (value.toString().split('-')[1] == '0') // 还没有审核
+            {
+                return '<a class="btn btn-primary btn-xs confirmRb" href="javascript:void(0)" title="审批同意" aria-label="审批同意" data-pjax="0"><span class="glyphicon glyphicon-ok"></span></a>' +
+                    '<a class="btn btn-primary btn-xs rejectRb" href="javascript:void(0)" title="拒绝" aria-label="拒绝" data-pjax="0"><span class="glyphicon glyphicon-remove"></span></a>';
+            }
+            else
+            {
+                return '<a class="btn btn-primary btn-xs viewRb" href="javascript:void(0)" title="查看" aria-label="查看" data-pjax="0"><span class="glyphicon glyphicon-info-sign"></span></a>'
+            }
+        }
+        function confirmRb(id, confirmed) {
+            $.ajax({
+                url: '{% url 'confirm_rb' %}',
+                method: 'post',
+                data: {'id': id, 'confirm': confirmed},
+            }).done(function (response) {
+                if (response == 1) {
+                    $.alert("审批成功");
+                    $('#rbtable').bootstrapTable('refresh');
+                }
+                else {
+                    $.alert("审批发生错误");
+                    $('#rbtable').bootstrapTable('refresh');
+                }
+            });
+        }
+        function viewRb(id) {
+            $.ajax({
+                url: '{% url 'view_rb' %}',
+                method: 'get',
+                data: {'id': id}
+            }).done(function (response) {
+               if (response != "")
+               {
+                   result = JSON.parse(response);
+                   var toDisplay = '<p>审核结果: '
+                   toDisplay += result['result'] ? "通过" : "拒绝";
+                   toDisplay += '</p><p>审核者: ';
+                   toDisplay += result['user'] + '</p><p>审核时间: ';
+                   toDisplay += result['time'];
+                   toDisplay += '</p>';
+                   console.log(toDisplay);
+                   $.alert(toDisplay);
+               }
+            });
+        }
+        window.rbActionEvents = {
+            'click .confirmRb': function (e, value) {
+                confirmRb(value.toString().split('-')[0], true);
+            },
+            'click .rejectRb': function (e, value) {
+                confirmRb(value.toString().split('-')[0], false);
+            },
+            'click .viewRb': function (e, value) {
+                viewRb(value.toString().split('-')[0]);
+            }
+        };
+    </script>
+</body>
+</htm>

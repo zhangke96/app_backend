@@ -113,7 +113,7 @@ f.write("获取笔记和描述: " + page.text + " 返回状态码: " + str(page.
 f.write("\n")
 
 # 测试加好友
-data = {'phone':'12345678901'}
+data = {'phone':'15850782151'}
 page = requests.post(SERVER_ADDRESS + "/account/addFriend/", cookies = cookie, data=data)
 f.write("加好友: " + page.text + " 返回状态码: " + str(page.status_code))
 f.write("\n")
@@ -173,43 +173,83 @@ page = requests.get(SERVER_ADDRESS + "/message/perfromTask/", cookies = cookie)
 f.write("获取所有执行的任务: " + page.text + " 返回状态码: " + str(page.status_code))
 f.write("\n")
 
+# 测试备用金申请
+data = {"applicant": "张柯", "department": "计算机", "detail": "买手机", "moneny": "伍佰圆",
+        "useDate": "2018-05-12", "returnDate": "2018-06-10", "cashier": "无", "note": "用来买个手机"}
+page = requests.post(SERVER_ADDRESS + "/moneny/reservefund/", cookies = cookie, data=data)
+f.write("备用金申请: " + page.text + " 返回的状态吗: " + str(page.status_code))
+f.write("\n")
+
+# 测试付款申请
+data = {"detail": "买电脑", "moneny": "10000", "type": "刷卡", "moneny": "伍佰圆",
+       "date": "2018-06-10", "payTo": "张", "bank": "中信银行南京城北支行", "account": "1234566"}
+page = requests.post(SERVER_ADDRESS + "/moneny/payment/", cookies = cookie, data=data)
+f.write("付款申请: " + page.text + " 返回的状态吗: " + str(page.status_code))
+f.write("\n")
+
+# 测试报销申请
+data = {"moneny": "10000", "type": "刷卡", "detail": "啦啦啦啦"}
+page = requests.post(SERVER_ADDRESS + "/moneny/reimbursement/", cookies = cookie, data=data)
+f.write("报销申请: " + page.text + " 返回的状态吗: " + str(page.status_code))
+f.write("\n")
+
+# 测试上传发票
+
+# 测试上传文件
+files = {
+    "file" : open("tests.py", "rb")
+}
+page = requests.post(SERVER_ADDRESS + '/upload/uploadinvoice/', cookies = cookie, files = files)
+f.write("上传发票测试结果: " + page.text + " 返回的状态码: " + str(page.status_code))
+f.write("\n")
+
+# 测试获取发票列表
+page = requests.get(SERVER_ADDRESS + '/upload/getInvoiceList/', cookies = cookie)
+f.write("获取发票列表: " + page.text + " 返回的状态码: " + str(page.status_code))
+f.write("\n")
+
+# 测试获取发票文件
+page = requests.get(SERVER_ADDRESS + "/upload/invoice-1/", cookies = cookie)
+f.write("获取发票文件: " + page.text[:10] + " 返回的状态码: " + str(page.status_code))
+f.write("\n")
+
 f.close()
 
-# 构造websocket header
-wsheader = {'Cookie': 'sessionid='+ str(cookie.get('sessionid'))}
-
-
-message1 = {"to":"15850782151", "type":"text","content":"hello"}
-meetingMessage = {"type":"meeting","members":"15850782151","begin_time":
-                  "2018/03/30 22:15", "end_time":"2018/03/31 22:00",
-                  "topic": "开个会"}
-def on_open(ws):
-    print('open')
-    def run(*arg):
-        ws.send(json.dumps(message1))
-        time.sleep(1)
-        ws.send(json.dumps(meetingMessage))
-    thread.start_new_thread(run, ())
-
-def on_message(ws, message):
-    print('message: ' + str(message))
-
-def on_error(ws, error):
-    print('error: ' + str(error))
-
-def on_close(ws):
-    print('close')
-
-# 测试连接websocket
-ws = websocket.WebSocketApp(SERVER_ADDRESS.replace("http", "ws"),
-                            on_open = on_open,
-                            on_message = on_message,
-                            on_error = on_error,
-                            on_close = on_close,
-                            header = wsheader)
-
-# time.sleep(5)
-ws.run_forever()
-# ws.keep_running = False
-ws.close()
-
+# # 构造websocket header
+# wsheader = {'Cookie': 'sessionid='+ str(cookie.get('sessionid'))}
+#
+#
+# message1 = {"to":"15850782151", "type":"text","content":"hello"}
+# meetingMessage = {"type":"meeting","members":"15850782151","begin_time":
+#                   "2018/03/30 22:15", "end_time":"2018/03/31 22:00",
+#                   "topic": "开个会"}
+# def on_open(ws):
+#     print('open')
+#     def run(*arg):
+#         ws.send(json.dumps(message1))
+#         time.sleep(1)
+#         ws.send(json.dumps(meetingMessage))
+#     thread.start_new_thread(run, ())
+#
+# def on_message(ws, message):
+#     print('message: ' + str(message))
+#
+# def on_error(ws, error):
+#     print('error: ' + str(error))
+#
+# def on_close(ws):
+#     print('close')
+#
+# # 测试连接websocket
+# ws = websocket.WebSocketApp(SERVER_ADDRESS.replace("http", "ws"),
+#                             on_open = on_open,
+#                             on_message = on_message,
+#                             on_error = on_error,
+#                             on_close = on_close,
+#                             header = wsheader)
+#
+# # time.sleep(5)
+# ws.run_forever()
+# # ws.keep_running = False
+# ws.close()
+#

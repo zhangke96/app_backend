@@ -23,5 +23,6 @@ urlpatterns = [
     url(r'^upload/', include('upload.urls')),
     url(r'^vedio/', include('vedio.urls')),
     url(r'^message/', include('message.urls')),
+    url(r'^moneny/', include('moneny.urls')),
     url(r'^test/', TemplateView.as_view(template_name='tool.html'))
 ]

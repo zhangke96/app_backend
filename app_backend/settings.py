@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'vedio',
     'channels',
     'message',
+    'moneny',
 ]
 
 MIDDLEWARE = [
@@ -84,7 +85,7 @@ DATABASES = {
         'NAME': 'app',
         'USER': 'root',
         'PASSWORD': '123456',
-        'HOST': '192.168.221.128',
+        'HOST': '192.168.1.177',
         'PORT': '',
     }
 }
@@ -127,6 +128,10 @@ USE_TZ = False
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
 STATIC_URL = '/static/'
+STATICFILES_DIRS = [os.path.join(BASE_DIR, "static"), ]
+
+# 需要与site.cnf 设置的静态文件路径相同
+STATIC_ROOT = '/var/www/html/static'
 
 # Server address
 
@@ -143,7 +148,7 @@ CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "asgi_redis.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [os.environ.get('REDIS_URL', 'redis://192.168.221.128:6379')],
+            "hosts": [os.environ.get('REDIS_URL', 'redis://192.168.1.177:6379')],
         },
         "ROUTING": "message.routing.message_routing",
     },

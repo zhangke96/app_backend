@@ -3,23 +3,38 @@ from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseU
 from .forms import SEX
 
 class MyUserManager(BaseUserManager):
-    pass
-    # def create_user(selfself, mobile, email, name, password):
-    #     if not mobile or len(mobile) != 11:
-    #         raise ValueError('电话错误')
-    #     if not email:
-    #         raise ValueError('邮箱必须有')
-    #     if not name:
-    #         raise ValueError('姓名必须有')
-    #     if not password:
-    #         raise ValueError('密码必须有')
+    def create_user(self, mobile, email, name, password=None):
+        user = self.model(
+            mobile=mobile,
+            email=email,
+            name=name
+        )
+        user.set_password(password)
+        user.save(using=self.db)
+        return user
 
+    def create_superuser(self, mobile, email, name, password):
+        """
+        Creates and saves a superuser with the given email, date of
+        birth and password.
+        """
+        user = self.create_user(
+            mobile=mobile,
+            email=email,
+            name=name,
+            password=password
+        )
+        user.is_admin = True
+        user.is_superuser = True
+        user.save(using=self._db)
+        return user
 
 class MyUser(AbstractBaseUser, PermissionsMixin):
     mobile = models.CharField("手机号码", max_length=11, unique=True)
     email = models.EmailField("邮箱", max_length=150, unique=True)
     name = models.CharField("姓名", max_length=150, null=False)
     is_active = models.BooleanField(default=True)
+    is_admin = models.BooleanField(default=False)
     USERNAME_FIELD = 'mobile'
     REQUIRED_FIELDS = ['email', 'name']
     friends = models.ManyToManyField(
@@ -43,6 +58,19 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
         return self.email
 
     def get_name(self):
+        return self.name
+
+    @property
+    def is_staff(self):
+        "Is the user a member of staff?"
+        # Simplest possible answer: All admins are staff
+        return self.is_admin
+
+    def get_short_name(self):
+        # The user is identified by their name
+        return self.name
+
+    def get_full_name(self):
         return self.name
 
 class UserInfo(models.Model):
